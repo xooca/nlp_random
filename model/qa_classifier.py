@@ -165,17 +165,19 @@ class MultiLabelBase(pl.LightningModule):
         idx = [output['idx'] for output in outputs]
         idx = list(itertools.chain.from_iterable(idx))
         
-        tweet = [output['tweet'] for output in outputs]
-        tweet = list(itertools.chain.from_iterable(tweet))
+        pred_result = {}
+        pred_result_final = {}
+        for label in self.label_cols:
+            pred = [output[label] for output in outputs]
+            pred_result.update({label:pred})
+            pred_result_final.update({'label':list(itertools.chain.from_iterable(t))})
+            
+            #actual = [output[''] for output in outputs]
 
-        offsets = [output['offsets'] for output in outputs]
-        offsets = list(itertools.chain.from_iterable(offsets))
-        
-        sentiment = [output['sentiment'] for output in outputs]
-        sentiment = list(itertools.chain.from_iterable(sentiment))
-        
-        filtered_output= self.extract_selected_text_batch(tweet, sentiment,start_positions, end_positions,offsets)
-        self.save_predictions(idx,start_positions, end_positions,filtered_output)
+            
+        #offsets = [output['offsets'] for output in outputs]
+        #offsets = list(itertools.chain.from_iterable(offsets))
+            
         return {}
 
     #def configure_optimizers(self):
