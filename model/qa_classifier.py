@@ -25,7 +25,6 @@ from tqdm import tqdm_notebook as tqdm
 import itertools
 from transformers import AdamW
 from transformers import get_linear_schedule_with_warmup
-##https://towardsdatascience.com/multilabel-classification-with-pytorch-in-5-minutes-a4fa8993cbc7
 class MultiLabelBase(pl.LightningModule):
     def __init__(self, model, tokenizer, prediction_save_path,class_num,label_cols):
         super().__init__()
