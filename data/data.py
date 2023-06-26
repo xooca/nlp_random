@@ -85,7 +85,7 @@ class QADataModule(pl.LightningDataModule):
             num_workers=self.dataloader_num_workers,
         )
     
-    @staticmethod()
+    @staticmethod
     def tokenize_function(examples):
         # Tokenize our examples with truncation and padding, but keep the overflows using a
         # stride. This results in one example possible giving several features when a context is long,
@@ -117,7 +117,7 @@ class QADataModule(pl.LightningDataModule):
         tokenized_examples[self.label_col] = ans
         return tokenized_examples
     
-    @staticmethod()
+    @staticmethod
     def prepare_train_features(examples):
         examples[self.text_col1] = [q.lstrip() for q in examples[self.text_col1]]
         examples[self.text_col2] = [c.lstrip() for c in examples[self.text_col2]]
