@@ -1,4 +1,5 @@
 # Adapted from https://github.com/huggingface/transformers/blob/master/examples/language-modeling/run_mlm.py
+# \b(?:\d{4}[ -]?){3}\d{4}\b|\b(?:\d{4}[ -]?){2}\d{6}\b|\b\d{4}[ -]?\d{6}[ -]?\d{5}\b|\b(?:\d{4}[ -]?){4}\d{3}\b
 import warnings
 from datasets import load_dataset
 import pytorch_lightning as pl
