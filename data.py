@@ -242,3 +242,96 @@ class LMDataModule(pl.LightningDataModule):
                     tokenized_examples["end_positions"].append(token_end_index + 1)
 
         return tokenized_examples
+
+
+
+from sklearn.model_selection import StratifiedShuffleSplit
+import pandas as pd
+
+def split_dataset(df, test_size=0.2, random_state=42):
+    """
+    Splits a text dataset into training and testing sets with even label distribution,
+    and ensures that the same text does not appear in both sets.
+
+    Parameters:
+    - df: pandas DataFrame containing 'id', 'text', and 'label' columns.
+    - test_size: the proportion of the dataset to include in the test split.
+    - random_state: seed for random number generator for reproducibility.
+
+    Returns:
+    - train_set: pandas DataFrame representing the training set.
+    - test_set: pandas DataFrame representing the testing set.
+    """
+
+    # Initialize StratifiedShuffleSplit
+    sss = StratifiedShuffleSplit(n_splits=1, test_size=test_size, random_state=random_state)
+
+    # Extract features and labels
+    X = df[['id', 'text']]
+    y = df['label']
+
+    # Iterate through the splits (there will be only one in this case)
+    for train_index, test_index in sss.split(X, y):
+        # Create training and testing sets
+        train_set = df.iloc[train_index]
+        test_set = df.iloc[test_index]
+
+    # Ensure no text appears in both sets
+    common_texts = set(train_set['text']).intersection(set(test_set['text']))
+    while len(common_texts) > 0:
+        # Select random index from the common texts
+        common_text_index = test_set[test_set['text'].isin(common_texts)].index[0]
+
+        # Move the text from the test set to the training set
+        train_set = train_set.append(test_set.loc[common_text_index])
+        test_set = test_set.drop(index=common_text_index)
+
+        # Update common_texts
+        common_texts = set(train_set['text']).intersection(set(test_set['text']))
+
+    return train_set, test_set
+
+# Example usage
+# Assuming you have a DataFrame df with columns 'id', 'text', and 'label'
+# train_set, test_set = split_dataset(df)
+
+from sklearn.model_selection import train_test_split
+import pandas as pd
+
+def split_dataset_v2(df, test_size=0.2, random_state=42):
+    """
+    Alternative version to split a text dataset into training and testing sets with even label distribution,
+    and ensures that the same text does not appear in both sets.
+
+    Parameters:
+    - df: pandas DataFrame containing 'id', 'text', and 'label' columns.
+    - test_size: the proportion of the dataset to include in the test split.
+    - random_state: seed for random number generator for reproducibility.
+
+    Returns:
+    - train_set: pandas DataFrame representing the training set.
+    - test_set: pandas DataFrame representing the testing set.
+    """
+
+    # Split the dataset into training and testing sets based on labels
+    train_set, test_set = train_test_split(df, test_size=test_size, stratify=df['label'], random_state=random_state)
+
+    # Ensure no text appears in both sets
+    common_texts = set(train_set['text']).intersection(set(test_set['text']))
+    while len(common_texts) > 0:
+        # Select random index from the common texts
+        common_text_index = test_set[test_set['text'].isin(common_texts)].index[0]
+
+        # Move the text from the test set to the training set
+        train_set = train_set.append(test_set.loc[common_text_index])
+        test_set = test_set.drop(index=common_text_index)
+
+        # Update common_texts
+        common_texts = set(train_set['text']).intersection(set(test_set['text']))
+
+    return train_set, test_set
+
+# Example usage
+# Assuming you have a DataFrame df with columns 'id', 'text', and 'label'
+# train_set, test_set = split_dataset_v2(df)
+
